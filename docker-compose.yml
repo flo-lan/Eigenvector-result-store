@@ -1,0 +1,41 @@
+version: '3.3'
+
+services:
+  eigenvector.node:
+    image: eigenvector.node
+    hostname: eigenvector.node
+    container_name: eigenvector.node
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - eigenvector.postgres:postgres
+    depends_on:
+      - 'eigenvector.postgres'
+    volumes:
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+      - SERVER_PORT=8080
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DIALECT=postgres
+      - DB_PASSWORD=devUserPassword
+      - DB_USER=dev_user
+      - DB_NAME=eigenvector_result_store
+    ports:
+      - '8080:8080'
+  eigenvector.postgres:
+    image: postgres:12-alpine
+    container_name: eigenvector.postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: devUserPassword
+      POSTGRES_DB: eigenvector_result_store
+
+volumes:
+  postgres_data:
